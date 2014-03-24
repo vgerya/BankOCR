@@ -5,7 +5,7 @@ import static com.mype.kata.ocrdigits.Character.*;
 /**
  * @author Vitaliy Gerya
  */
-public enum Entry {
+public enum Digit {
 
     //    "   _  _     _  _  _  _  _  _\n" +
     //    " | _| _||_||_ |_   ||_||_|| |\n" +
@@ -24,7 +24,7 @@ public enum Entry {
 
     private String representation;
 
-    Entry(Character... representation) {
+    Digit(Character... representation) {
         StringBuilder sb = new StringBuilder();
         for (Character character : representation) {
             sb.append(character.getSymbol());
@@ -36,17 +36,17 @@ public enum Entry {
         return ordinal();
     }
 
-    public static Entry createFromLines(final String row1, final String row2, final String row3) {
+    public static Digit createFromLines(final String row1, final String row2, final String row3) {
         boolean lengthCompatible = row1.length() == 3 && row2.length() == 3 && row3.length() == 3;
         if(!lengthCompatible)
             throw new IllegalArgumentException("Parts should be 3 char length. But was:\n" + row1 + "\n" + row2 +
                     "\n" + row3);
 
-        for(Entry entry: values()) {
+        for(Digit digit : values()) {
 
-            boolean matches = entry.representation.startsWith(row1) && entry.representation.substring(3, 6).equals(row2) && entry.representation.endsWith(row3);
+            boolean matches = digit.representation.startsWith(row1) && digit.representation.substring(3, 6).equals(row2) && digit.representation.endsWith(row3);
             if(matches)
-                return entry;
+                return digit;
         }
 
         throw new IllegalStateException("Not found acceptable entry for: \n'" + row1 + "'\n'" + row2 + "'\n'" + row3

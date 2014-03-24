@@ -4,6 +4,7 @@ import org.junit.After;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 
 import static org.fest.assertions.api.Assertions.assertThat;
@@ -15,7 +16,7 @@ public class OCRReaderTest {
 
     private OCRReader reader;
     private final String allDigits =
-            "    _  _     _  _  _  _  _  _\n" +
+            "    _  _     _  _  _  _  _  _ \n" +
             "  | _| _||_||_ |_   ||_||_|| |\n" +
             "  ||_  _|  | _||_|  ||_| _||_|";
 
@@ -41,6 +42,76 @@ public class OCRReaderTest {
         reader = new OCRReader(new InputStreamReader(new ByteArrayInputStream(input.getBytes())));
         Row entry = reader.read();
         assertThat(entry.toNumber()).isEqualTo(123456789l);
+    }
+
+    @Test(expected = IOException.class)
+    public void shouldCheckRow1Length() throws Exception {
+        final String input = "   _  _     _  _  _  _  _ \n" +
+                             "  | _| _||_||_ |_   ||_||_|\n" +
+                             "  ||_  _|  | _||_|  ||_| _|\n" +
+                             "                           \n";
+        reader = new OCRReader(new InputStreamReader(new ByteArrayInputStream(input.getBytes())));
+        Row entry = reader.read();
+    }
+
+    @Test(expected = IOException.class)
+    public void shouldCheckRow2Length() throws Exception {
+        final String input = "    _  _     _  _  _  _  _ \n" +
+                " | _| _||_||_ |_   ||_||_|\n" +
+                "  ||_  _|  | _||_|  ||_| _|\n" +
+                "                           \n";
+        reader = new OCRReader(new InputStreamReader(new ByteArrayInputStream(input.getBytes())));
+        reader.read();
+    }
+
+    @Test(expected = IOException.class)
+    public void shouldCheckRow3Length() throws Exception {
+        final String input =    "    _  _     _  _  _  _  _ \n" +
+                                "  | _| _||_||_ |_   ||_||_|\n" +
+                                " ||_  _|  | _||_|  ||_| _|\n" +
+                                "                           \n";
+        reader = new OCRReader(new InputStreamReader(new ByteArrayInputStream(input.getBytes())));
+        reader.read();
+    }
+
+    @Test(expected = IOException.class)
+    public void shouldCheckLastRowIsEmpty() throws Exception {
+        final String input =    "    _  _     _  _  _  _  _ \n" +
+                                "  | _| _||_||_ |_   ||_||_|\n" +
+                                "  ||_  _|  | _||_|  ||_| _|\n" +
+                                "               _           \n";
+        reader = new OCRReader(new InputStreamReader(new ByteArrayInputStream(input.getBytes())));
+        reader.read();
+    }
+
+    @Test
+    public void eachAccountNumberIs9Digit() throws Exception {
+        final String input =    "    _  _     _  _  _  _  _ \n" +
+                                "  | _| _||_||_ |_   ||_||_|\n" +
+                                "  ||_  _|  | _||_|  ||_| _|\n" +
+                                "                           \n";
+        reader = new OCRReader(new InputStreamReader(new ByteArrayInputStream(input.getBytes())));
+        Row entry = reader.read();
+        assertThat(entry.length()).isEqualTo(9);
+    }
+
+    @Test
+    public void shouldReadTwoOrMoreAccounts() throws Exception {
+        final String input =    "    _  _     _  _  _  _  _ \n" +
+                                "  | _| _||_||_ |_   ||_||_|\n" +
+                                "  ||_  _|  | _||_|  ||_| _|\n" +
+                                "                           \n" +
+                                "    _  _     _  _  _  _  _ \n" +
+                                "  | _| _||_||_ |_   ||_||_|\n" +
+                                "  ||_  _|  | _||_|  ||_| _|\n" +
+                                "                           \n";
+        reader = new OCRReader(new InputStreamReader(new ByteArrayInputStream(input.getBytes())));
+        Row row = reader.read();
+        assertThat(row).isNotNull();
+        row = reader.read();
+        assertThat(row).isNotNull();
+        row = reader.read();
+        assertThat(row).isNull();
     }
 
 
