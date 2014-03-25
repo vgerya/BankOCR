@@ -21,6 +21,16 @@ public class Row {
         return number;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (Digit rowDigit : rowDigits) {
+            sb.append(rowDigit.toNumber());
+        }
+
+        return sb.toString();
+    }
+
     public int length() {
         return rowDigits.size();
     }
